@@ -14,8 +14,8 @@ import difflib
 from rouge import Rouge
 import sys
 import os
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) #当前程序上上一级目录
-sys.path.append(BASE_DIR) #添加环境变量
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # 当前程序上上一级目录
+sys.path.append(BASE_DIR)  # 添加环境变量
 from models.SIF_model import GETSentence_Embedding, cleanReviewChinese
 
 # 带有人工摘要内容的测试文本标题

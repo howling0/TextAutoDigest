@@ -22,13 +22,13 @@ debugging=0
 
 # 运行python服务
 echo "############ Hebron Starting... #################"
-python ./abstra.py --data_dir=$data_dir \
-                   --wv_file_name=$wv_file_name \
-                   --score_title_weight=$score_title_weight \
-                   --knn_w_c=$knn_w_c \
-                   --knn_w_o=$knn_w_o \
-                   --knn_k=$knn_k \
-                   --sentence_embed_a=$sentence_embed_a \
-                   --abstract_percent=$abstract_percent \
-                   --max_output_length=$max_output_length \
-                   --debugging=$debugging
+python ./application.py --data_dir=$data_dir \
+                        --wv_file_name=$wv_file_name \
+                        --score_title_weight=$score_title_weight \
+                        --knn_w_c=$knn_w_c \
+                        --knn_w_o=$knn_w_o \
+                        --knn_k=$knn_k \
+                        --sentence_embed_a=$sentence_embed_a \
+                        --abstract_percent=$abstract_percent \
+                        --max_output_length=$max_output_length \
+                        --debugging=$debugging

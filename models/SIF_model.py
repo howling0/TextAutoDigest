@@ -1,4 +1,3 @@
-
 '''
 @File       : SIF_model.py
 @Author     : Zeen Song
@@ -66,6 +65,7 @@ def text2sentence(text):
     # 很多规则中会考虑分号;，但是这里我把它忽略不计，破折号、英文双引号等同样忽略，需要的再做些简单调整即可。
     return text.split("\n")
 
+
 def Get_Score(Vs,Vt,Vc,w1=0.4,w2=0.6):
     '''
     通过计算每一个句子向量与标题、全文的加权余弦近似度，通过sigmoid函数将结果映射到0~1之间
@@ -81,15 +81,17 @@ def Get_Score(Vs,Vt,Vc,w1=0.4,w2=0.6):
         Score_dict[sentence] = w1*sigmoid(vs.dot(Vt))+w2*sigmoid(vs.dot(Vc))
     return Score_dict
 
+
 def sigmoid(x):
     '''
     计算sigmoid函数
     '''
     return 1/(1+np.exp(-x))
 
+
 def do_KNN(Score_dict,sentences,w_C=2,w_O=5,k=1):
     '''
-    对每一个分数取前后一句话的加权
+    对每一个分数取前后k句话的加权
     --------------------------
     Score_dict: Dict{str:float}
     sentences: List[str]
@@ -116,6 +118,7 @@ def do_KNN(Score_dict,sentences,w_C=2,w_O=5,k=1):
             new_dict[sentence] = new_dict[sentence]/(w_O+2*k*w_C)
     return new_dict
 
+
 def summarize(Score_dict,sentences,k=20):
     '''
     根据打分输出句子
@@ -131,7 +134,8 @@ def summarize(Score_dict,sentences,k=20):
         if Score_dict[sentence] > lower_bound:
             output.append(sentence)
     return output
-    
+
+
 class GETSentence_Embedding():
     '''
     通过输入的句子产生句向量
@@ -164,7 +168,7 @@ class GETSentence_Embedding():
         self.max_output_length = max_output_length
         self.stopwords_path = stopwords_path
 
-    def _process_sentence(self):
+    def _preprocess_sentence(self):
         '''
         使用与预处理相同的方法进行分词
         -------------------------
@@ -181,14 +185,14 @@ class GETSentence_Embedding():
 
         self.sentence = sentence
 
-    def sentence_EMB(self,a=0.0001):
+    def sentence_EMB(self, a=0.0001):
         '''
         使用SIF方法获得加权句向量 注: 此处未进行SVD
         -------------------------------------
         a: float (可调参数)
         :rtype: np.array
         '''
-        clean_sentence = self._process_sentence()
+        clean_sentence = self._preprocess_sentence()
         vs = np.zeros(self.model.wv.vector_size)
         for word in clean_sentence:
             # use laplace smoothing for OOV word
@@ -203,7 +207,7 @@ class GETSentence_Embedding():
 
             vs = vs+(a/(a+freq))*vw
 
-        if len(clean_sentence)==0: #if the sentence is empty after stopwords-removal
+        if len(clean_sentence) == 0:  # if the sentence is empty after stopwords-removal
             vs = np.random.rand(self.model.wv.vector_size)
             return vs
 
@@ -211,7 +215,7 @@ class GETSentence_Embedding():
 
         return vs
 
-    def do_SVD(self,VS):
+    def do_SVD(self, VS):
         '''
         对整个文章的句向量进行SVD，每一个句向量减去第一个特征向量
         ------------------------------------------------
@@ -233,13 +237,17 @@ class GETSentence_Embedding():
         # Seperate sentences
         sentences = text2sentence(text)
         if not title and sentences:
-            # Using the first sentence as the title
+            # Set the first sentence as the title, if no title
             title = sentences[0]
         # TODO Determine a suitable way to set the output length
         output_length = int(len(sentences) * self.abstract_percent)
         # Add a length limit
         if output_length > self.max_output_length:
             output_length = self.max_output_length
+
+        # If there is less than 3 sentences in article, return the 1st sentence as abstract
+        if len(sentences) <= 3:
+            return sentences[0]
 
         ## Get sentence embeddings of every sentence
         Vs = {}
@@ -251,9 +259,9 @@ class GETSentence_Embedding():
         Matrix = np.transpose(Matrix)
         self.do_SVD(Matrix)
         u = self.singular_vector[:,0].reshape(self.word_vector_size,1)
+        PC = u * np.transpose(u)
         for sentence in sentences:
             vs = Vs[sentence]
-            PC = u*np.transpose(u)
             vs = vs-PC.dot(vs)
             Vs[sentence] = vs
 
@@ -277,12 +285,3 @@ class GETSentence_Embedding():
         output = summarize(Score_dict,sentences,k=output_length)
 
         return ' '.join(output)
-
-
-
-
-
-
-        
-        
-        

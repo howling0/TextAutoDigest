@@ -1,5 +1,6 @@
-from models.SIF_model import GETSentence_Embedding,text2sentence,Get_Score,sigmoid,do_KNN,summarize
+from models.SIF_model import GETSentence_Embedding, text2sentence,Get_Score, sigmoid,do_KNN,summarize
 import numpy as np
+
 
 def extract(model, text, title=None):
     '''
@@ -58,3 +59,8 @@ def extract(model, text, title=None):
     output = summarize(Score_dict,sentences,k=output_length)
 
     return ' '.join(output)
+
+
+if __name__ == '__main__':
+
+    pass
